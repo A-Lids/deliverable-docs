@@ -7,21 +7,23 @@ description: 'Overview of the email verification and task status API'
 
 This API supports email verification and task status checks. Submit an email for verification and use the returned task ID to poll for results.
 
-<Card
-  title="OpenAPI specification"
-  icon="file-code"
-  href="/api-reference/openapi.json"
->
-  View the full OpenAPI specification
-</Card>
+## Creating an API key
+
+Create and manage your API keys in the Deliverable dashboard:
+
+1. Go to [**API keys**](https://app.deliverable.co/app/api).
+2. Sign in or create an account if needed.
+3. Create a new API key. Copy and store it securely; it is shown only once.
+
+Use this key in the `x-api-key` header for all API requests.
 
 ## Base URL
 
-All requests use the base URL from your environment (for example, `http://sandbox.mintlify.com` for sandbox).
+Use the base URL for your environment (for example, `https://api.deliverable.co` for production). Check the API documentation or your dashboard for the exact URL.
 
 ## Authentication
 
-All endpoints require an API key. Send it in the `x-api-key` header with every request.
+Send your API key in the `x-api-key` header with every request:
 
 ```json
 "security": [
@@ -31,4 +33,7 @@ All endpoints require an API key. Send it in the `x-api-key` header with every r
 ]
 ```
 
-You need a valid API key and an active subscription. Invalid or missing keys return `401`; expired or unpaid subscriptions return `402`.
+### Requirements
+
+- **Valid API key** — Keys are created at [app.deliverable.co/app/api](https://app.deliverable.co/app/api). Invalid or missing keys return `401 Unauthorized`.
+- **Active subscription** — Your account must have an active, paid subscription. Expired plans, failed payments, or accounts that require payment return `402 Payment Required`. Renew or update your subscription in the dashboard to restore access.
