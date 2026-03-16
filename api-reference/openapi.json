@@ -6,7 +6,7 @@
     "license": { "name": "MIT" },
     "version": "1.0.0"
   },
-  "servers": [{ "url": "https://api.deliverable.com/gateway" }],
+  "servers": [{ "url": "https://api.deliverable.co/gateway" }],
   "security": [{ "apiKeyAuth": [] }],
   "paths": {
     "/verify/single": {
