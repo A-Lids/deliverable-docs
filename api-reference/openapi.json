@@ -3,21 +3,11 @@
   "info": {
     "title": "Deliverable Docs API",
     "description": "API for email verification and task status.",
-    "license": {
-      "name": "MIT"
-    },
+    "license": { "name": "MIT" },
     "version": "1.0.0"
   },
-  "servers": [
-    {
-      "url": "https://sit-api.deliverable.com/api/v1"
-    }
-  ],
-  "security": [
-    {
-      "apiKeyAuth": []
-    }
-  ],
+  "servers": [{ "url": "https://api.deliverable.com/gateway" }],
+  "security": [{ "apiKeyAuth": [] }],
   "paths": {
     "/verify/single": {
       "post": {
@@ -27,9 +17,7 @@
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifySingleEmailRequest"
-              }
+              "schema": { "$ref": "#/components/schemas/VerifySingleEmailRequest" }
             }
           }
         },
@@ -38,141 +26,59 @@
             "description": "Email added to queue successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerifySingleEmailResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/VerifySingleEmailResponse" }
               }
             }
           },
-          "400": {
-            "description": "Bad request — invalid or missing email",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Insufficient credits, subscription expired, or payment required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+          "400": { "description": "Bad request — invalid or missing email", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "402": { "description": "Insufficient credits, subscription expired, or payment required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
     "/verify/single/status": {
       "post": {
         "summary": "Get Single Email Task Status",
-        "description": "Returns the verification status for a task created by the `/verify/single` endpoint. Use the `task_id` returned from that endpoint. The result will either be `pending` (still processing) or `success` (with full verification result).",
+        "description": "Returns the verification status for a task created by the `/verify/single` endpoint. The result will either be `pending` (still processing) or `completed` (with full verification result).",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetEmailTaskStatusRequest"
-              }
+              "schema": { "$ref": "#/components/schemas/GetEmailTaskStatusRequest" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "Task status returned — either pending or success with result",
+            "description": "Task status returned — either pending or completed with result",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/EmailTaskStatusPendingResponse"
-                    },
-                    {
-                      "$ref": "#/components/schemas/EmailTaskStatusSuccessResponse"
-                    }
+                    { "title": "Pending", "$ref": "#/components/schemas/EmailTaskStatusPendingResponse" },
+                    { "title": "Completed", "$ref": "#/components/schemas/EmailTaskStatusCompletedResponse" }
                   ]
                 }
               }
             }
           },
-          "400": {
-            "description": "Task ID is missing or invalid",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Subscription expired or payment required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+          "400": { "description": "Task ID is missing or invalid", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "402": { "description": "Subscription expired or payment required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
     "/verify/bulk": {
       "post": {
         "summary": "Verify Bulk Emails",
-        "description": "Upload a CSV or TXT file containing a list of email addresses for bulk verification. Returns a `file_id` to track the processing status via `/verify/bulk/status`. Consumes credits based on the number of emails in the file. Max file size is 25MB. Requires a valid API key and active subscription.",
+        "description": "Upload a CSV or TXT file containing a list of email addresses for bulk verification. Returns a `file_id` to track the processing status via `/verify/bulk/status`. Consumes credits based on the number of emails in the file. Max file size is 25MB.",
         "requestBody": {
           "required": true,
           "content": {
             "multipart/form-data": {
-              "schema": {
-                "$ref": "#/components/schemas/VerifyBulkEmailRequest"
-              }
+              "schema": { "$ref": "#/components/schemas/VerifyBulkEmailRequest" }
             }
           }
         },
@@ -181,430 +87,178 @@
             "description": "File uploaded and queued for processing",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/VerifyBulkEmailResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/VerifyBulkEmailResponse" }
               }
             }
           },
-          "400": {
-            "description": "Bad request — invalid file format, missing file, or invalid headers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Insufficient credits, subscription expired, or payment required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "413": {
-            "description": "File size exceeds 25MB limit",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+          "400": { "description": "Bad request — invalid file format, missing file, or invalid headers", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "402": { "description": "Insufficient credits, subscription expired, or payment required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "413": { "description": "File size exceeds 25MB limit", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
     "/verify/bulk/status": {
       "post": {
         "summary": "Get Bulk File Status & Download URL",
-        "description": "Returns the processing status of a bulk verification file using its `file_id`. If processing is complete, a download URL for the results file is also returned.",
+        "description": "Returns the processing status of a bulk verification file using its `file_id`. If processing is complete, a signed download URL for the results CSV is also returned. The URL expires after 1 hour.",
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/GetBulkFileStatusRequest"
-              }
+              "schema": { "$ref": "#/components/schemas/GetBulkFileStatusRequest" }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "File status returned — either processing or completed with download URL",
+            "description": "File status returned — either pending or completed with download URL",
             "content": {
               "application/json": {
                 "schema": {
                   "oneOf": [
-                    {
-                      "$ref": "#/components/schemas/BulkFileStatusPendingResponse"
-                    },
-                    {
-                      "$ref": "#/components/schemas/BulkFileStatusCompletedResponse"
-                    }
+                    { "title": "Pending", "$ref": "#/components/schemas/BulkFileStatusPendingResponse" },
+                    { "title": "Completed", "$ref": "#/components/schemas/BulkFileStatusCompletedResponse" }
                   ]
                 }
               }
             }
           },
-          "400": {
-            "description": "File ID is missing or invalid",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Subscription expired or payment required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+          "400": { "description": "File ID is missing or invalid", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "402": { "description": "Subscription expired or payment required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     },
     "/verify/bulk/files": {
       "get": {
         "summary": "Get All Bulk Files",
-        "description": "Returns a paginated list of all bulk verification files submitted under the authenticated API key. Supports pagination and optional search. Useful for tracking history and status of past uploads.",
+        "description": "Returns a paginated list of all bulk verification files submitted under the authenticated API key. Supports pagination and optional search.",
         "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "required": true,
-            "description": "Page number for pagination",
-            "schema": {
-              "type": "integer",
-              "example": 1
-            }
-          },
-          {
-            "name": "pageSize",
-            "in": "query",
-            "required": true,
-            "description": "Number of results per page",
-            "schema": {
-              "type": "integer",
-              "example": 10
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "required": false,
-            "description": "Optional search term to filter files by name",
-            "schema": {
-              "type": "string",
-              "example": "emails"
-            }
-          }
+          { "name": "page", "in": "query", "required": true, "description": "Page number for pagination", "schema": { "type": "integer", "example": 1 } },
+          { "name": "pageSize", "in": "query", "required": true, "description": "Number of results per page", "schema": { "type": "integer", "example": 10 } },
+          { "name": "search", "in": "query", "required": false, "description": "Optional search term to filter files by name", "schema": { "type": "string", "example": "my-list" } }
         ],
         "responses": {
           "200": {
             "description": "List of bulk files returned successfully",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GetBulkFilesResponse"
-                }
+                "schema": { "$ref": "#/components/schemas/GetBulkFilesResponse" }
               }
             }
           },
-          "400": {
-            "description": "Missing or invalid query parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "402": {
-            "description": "Subscription expired or payment required",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Rate limit exceeded",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
+          "400": { "description": "Missing or invalid query parameters", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "401": { "description": "Invalid API key", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "402": { "description": "Subscription expired or payment required", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } },
+          "429": { "description": "Rate limit exceeded", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Error" } } } }
         }
       }
     }
   },
   "components": {
     "schemas": {
+      "MessageEnvelope": {
+        "type": "object",
+        "properties": {
+          "status": { "type": "string", "example": "success" },
+          "statusCode": { "type": "integer", "example": 200 },
+          "description": { "type": "string", "example": "Operation completed successfully" }
+        }
+      },
       "VerifySingleEmailRequest": {
         "type": "object",
-        "required": [
-          "email"
-        ],
+        "required": ["email"],
         "properties": {
-          "email": {
-            "type": "string",
-            "format": "email",
-            "description": "The email address to verify",
-            "example": "user@example.com"
-          }
+          "email": { "type": "string", "format": "email", "description": "The email address to verify", "example": "user@example.com" }
         }
       },
       "VerifySingleEmailResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "Email added to queue successfully"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "Email added to queue successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "task_id": {
-                "type": "string",
-                "description": "Use this ID with /verify/single/status to poll for the result",
-                "example": "task_abc123xyz"
-              }
+              "task_id": { "type": "string", "description": "Use this ID with /verify/single/status to poll for the result", "example": "task_abc123xyz" }
             }
           }
         }
       },
       "GetEmailTaskStatusRequest": {
         "type": "object",
-        "required": [
-          "task_id"
-        ],
+        "required": ["task_id"],
         "properties": {
-          "task_id": {
-            "type": "string",
-            "description": "Task ID returned from /verify/single",
-            "example": "task_abc123xyz"
-          }
+          "task_id": { "type": "string", "description": "Task ID returned from /verify/single", "example": "task_abc123xyz" }
         }
       },
       "EmailTaskStatusPendingResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "Email task is still processing"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "Email task status fetched successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "task_id": {
-                "type": "string",
-                "example": "task_abc123xyz"
-              },
-              "processing_status": {
-                "type": "string",
-                "enum": [
-                  "pending"
-                ],
-                "example": "pending"
-              }
+              "processing_status": { "type": "string", "enum": ["pending"], "example": "pending" },
+              "task_id": { "type": "string", "example": "task_abc123xyz" }
             }
           }
         }
       },
-      "EmailTaskStatusSuccessResponse": {
+      "EmailTaskStatusCompletedResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "Email task status fetched successfully"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "Email task status fetched successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "task_id": {
-                "type": "string",
-                "example": "task_abc123xyz"
-              },
-              "email": {
-                "type": "string",
-                "format": "email",
-                "example": "user@example.com"
-              },
-              "email_status": {
-                "type": "string",
-                "description": "Verification result for the email (e.g. valid, invalid, risky)",
-                "example": "valid"
-              },
-              "is_catch_all": {
-                "type": "boolean",
-                "description": "Whether the email domain accepts all addresses regardless of validity",
-                "example": false
-              },
-              "processing_status": {
-                "type": "string",
-                "enum": [
-                  "success"
-                ],
-                "example": "success"
-              }
+              "processing_status": { "type": "string", "enum": ["completed"], "example": "completed" },
+              "task_id": { "type": "string", "example": "task_abc123xyz" },
+              "email": { "type": "string", "format": "email", "example": "user@example.com" },
+              "email_status": { "type": "string", "description": "Verification result — deliverable, undeliverable, risky, or unknown", "example": "deliverable" },
+              "is_catch_all": { "type": "boolean", "description": "Whether the domain accepts all addresses regardless of validity", "example": false }
             }
           }
         }
       },
       "VerifyBulkEmailRequest": {
         "type": "object",
-        "required": [
-          "file",
-          "fileName"
-        ],
+        "required": ["file", "fileName"],
         "properties": {
-          "file": {
-            "type": "string",
-            "format": "binary",
-            "description": "CSV or TXT file containing one email address per line. Max size: 25MB."
-          },
-          "fileName": {
-            "type": "string",
-            "description": "Name to identify this file upload",
-            "example": "my-email-list.csv"
-          }
+          "file": { "type": "string", "format": "binary", "description": "CSV or TXT file containing one email address per line. Max size: 25MB." },
+          "fileName": { "type": "string", "description": "Name to identify this file upload", "example": "my-email-list" }
         }
       },
       "VerifyBulkEmailResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "File uploaded and queued for processing"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "Email added to queue successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "file_id": {
-                "type": "string",
-                "description": "Use this ID with /verify/bulk/status to track processing",
-                "example": "file_xyz789abc"
-              },
-              "file_name": {
-                "type": "string",
-                "example": "emails.csv"
-              },
-              "total_emails": {
-                "type": "integer",
-                "description": "Number of email addresses detected in the uploaded file",
-                "example": 1500
-              }
+              "file_id": { "type": "string", "description": "Use this ID with /verify/bulk/status to track processing", "example": "file_abc123xyz" }
             }
           }
         }
       },
       "GetBulkFileStatusRequest": {
         "type": "object",
-        "required": [
-          "file_id"
-        ],
+        "required": ["file_id"],
         "properties": {
-          "file_id": {
-            "type": "string",
-            "description": "File ID returned from /verify/bulk",
-            "example": "file_xyz789abc"
-          }
+          "file_id": { "type": "string", "description": "File ID returned from /verify/bulk", "example": "file_abc123xyz" }
         }
       },
       "BulkFileStatusPendingResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "File is still being processed"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "File status fetched successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "file_id": {
-                "type": "string",
-                "example": "file_xyz789abc"
-              },
-              "file_name": {
-                "type": "string",
-                "example": "emails.csv"
-              },
-              "processing_status": {
-                "type": "string",
-                "enum": [
-                  "pending",
-                  "processing"
-                ],
-                "example": "processing"
-              }
+              "status": { "type": "string", "enum": ["pending"], "example": "pending" },
+              "download_url": { "type": "string", "description": "Empty string when file is still processing", "example": "" }
             }
           }
         }
@@ -612,48 +266,12 @@
       "BulkFileStatusCompletedResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "File processed successfully"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "File status fetched successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
-              "file_id": {
-                "type": "string",
-                "example": "file_xyz789abc"
-              },
-              "file_name": {
-                "type": "string",
-                "example": "emails.csv"
-              },
-              "processing_status": {
-                "type": "string",
-                "enum": [
-                  "completed"
-                ],
-                "example": "completed"
-              },
-              "total_emails": {
-                "type": "integer",
-                "example": 1500
-              },
-              "processed_emails": {
-                "type": "integer",
-                "example": 1500
-              },
-              "download_url": {
-                "type": "string",
-                "format": "uri",
-                "description": "Signed URL to download the results CSV. Expires after a set duration.",
-                "example": "https://cdn.deliverable.com/results/file_xyz789abc.csv?token=..."
-              },
-              "expires_at": {
-                "type": "string",
-                "format": "date-time",
-                "description": "Expiry time of the download URL",
-                "example": "2025-01-01T12:00:00Z"
-              }
+              "status": { "type": "string", "enum": ["completed"], "example": "completed" },
+              "download_url": { "type": "string", "format": "uri", "description": "Signed URL to download the results CSV. Expires after 1 hour.", "example": "https://storage.example.com/results/file_abc123xyz.csv?token=..." }
             }
           }
         }
@@ -661,10 +279,7 @@
       "GetBulkFilesResponse": {
         "type": "object",
         "properties": {
-          "message": {
-            "type": "string",
-            "example": "Bulk files fetched successfully"
-          },
+          "message": { "allOf": [{ "$ref": "#/components/schemas/MessageEnvelope" }, { "properties": { "description": { "example": "Bulk files fetched successfully" } } }] },
           "data": {
             "type": "object",
             "properties": {
@@ -673,49 +288,35 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "file_id": {
-                      "type": "string",
-                      "example": "file_xyz789abc"
+                    "_id": { "type": "string", "example": "file_abc123xyz" },
+                    "file_name": { "type": "string", "example": "my-email-list" },
+                    "state": { "type": "string", "enum": ["pending", "processing", "completed", "failed"], "example": "completed" },
+                    "type": { "type": "string", "enum": ["api", "website"], "example": "api" },
+                    "service_name": { "type": "string", "example": "verify_email" },
+                    "options": {
+                      "type": "object",
+                      "properties": {
+                        "credit_usage": { "type": "integer", "description": "Credits consumed for this file", "example": 100 },
+                        "credit_refund": { "type": "integer", "description": "Credits refunded for unverifiable emails", "example": 2 }
+                      }
                     },
-                    "file_name": {
-                      "type": "string",
-                      "example": "emails.csv"
+                    "meta_data": {
+                      "type": "object",
+                      "properties": {
+                        "deliverable": { "type": "integer", "example": 80 },
+                        "undeliverable": { "type": "integer", "example": 15 },
+                        "unknown": { "type": "integer", "example": 3 },
+                        "risky": { "type": "integer", "example": 2 }
+                      }
                     },
-                    "processing_status": {
-                      "type": "string",
-                      "enum": [
-                        "pending",
-                        "processing",
-                        "completed",
-                        "failed"
-                      ],
-                      "example": "completed"
-                    },
-                    "total_emails": {
-                      "type": "integer",
-                      "example": 1500
-                    },
-                    "created_at": {
-                      "type": "string",
-                      "format": "date-time",
-                      "example": "2024-12-01T10:00:00Z"
-                    }
+                    "createdAt": { "type": "string", "format": "date-time", "example": "2026-01-01T10:00:00.000Z" },
+                    "updatedAt": { "type": "string", "format": "date-time", "example": "2026-01-01T10:05:00.000Z" }
                   }
                 }
               },
-              "totalCount": {
-                "type": "integer",
-                "description": "Total number of files matching the query",
-                "example": 25
-              },
-              "page": {
-                "type": "integer",
-                "example": 1
-              },
-              "pageSize": {
-                "type": "integer",
-                "example": 10
-              }
+              "totalCount": { "type": "integer", "description": "Total number of files matching the query", "example": 25 },
+              "page": { "type": "integer", "example": 1 },
+              "pageSize": { "type": "integer", "example": 10 }
             }
           }
         }
@@ -723,15 +324,8 @@
       "Error": {
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32",
-            "example": 400
-          },
-          "message": {
-            "type": "string",
-            "example": "Invalid request body"
-          }
+          "error": { "type": "integer", "format": "int32", "example": 400 },
+          "message": { "type": "string", "example": "Invalid request body" }
         }
       }
     },
