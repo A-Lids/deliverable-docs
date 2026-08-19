@@ -172,7 +172,8 @@
         "type": "object",
         "required": ["email"],
         "properties": {
-          "email": { "type": "string", "format": "email", "description": "The email address to verify", "example": "user@example.com" }
+          "email": { "type": "string", "format": "email", "description": "The email address to verify", "example": "user@example.com" },
+          "mode": { "type": "string", "format": "enum", "description": "The mode to verify the email address, by default it is set to catch_all", "enum": ["catch_all", "non_catch_all"], "example": "catch_all" }
         }
       },
       "VerifySingleEmailResponse": {
@@ -228,7 +229,8 @@
         "required": ["file", "fileName"],
         "properties": {
           "file": { "type": "string", "format": "binary", "description": "CSV or TXT file containing one email address per line. Max size: 25MB." },
-          "fileName": { "type": "string", "description": "Name to identify this file upload", "example": "my-email-list" }
+          "fileName": { "type": "string", "description": "Name to identify this file upload", "example": "my-email-list" },
+          "mode": { "type": "string", "format": "enum", "description": "The mode to verify the email addresses, by default it is set to catch_all", "enum": ["catch_all", "non_catch_all"], "example": "catch_all" }
         }
       },
       "VerifyBulkEmailResponse": {
