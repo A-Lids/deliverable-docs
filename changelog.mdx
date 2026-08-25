@@ -1,0 +1,60 @@
+---
+title: 'Changelog'
+description: 'Product updates and API changes for Deliverable'
+---
+
+<Update label="Aug 25, 2026">
+
+## Bulk Verify API now requires an `emailColumn` field
+
+You can now tell Deliverable which CSV column holds the emails, instead of being forced to name that column `Email`.
+
+This is a **breaking change** for `POST /verify/bulk`. Update your integration before you send the next file.
+
+### What's changing
+
+- You must send `emailColumn` in the request. That is the header name in your CSV — for example `Email`, `Work Email`, or `email`.
+- The file must have a real header row. A bare list of addresses with no header will be rejected.
+- `emailColumn` must be a column name, not an email address.
+
+### Example request
+
+```http
+POST /verify/bulk
+Content-Type: multipart/form-data
+
+file: your-list.csv
+fileName: Q3 outreach
+emailColumn: Work Email
+mode: catch_all
+```
+
+### Valid file
+
+```csv
+Work Email,Name
+alex@acme.com,Alex
+```
+
+### Rejected file (no header)
+
+```csv
+alex@acme.com
+sam@acme.com
+```
+
+If the header is missing, the API returns:
+
+```
+Email column header is missing from the file
+```
+
+### What you need to do
+
+1. Add a header row to every bulk CSV.
+2. Pass that header as `emailColumn`.
+3. If you already use a column named `Email`, send `emailColumn=Email`.
+
+The website bulk upload is unchanged. Single email verification (`POST /verify/single`) is unchanged.
+
+</Update>
