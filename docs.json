@@ -41,6 +41,7 @@
       },
       {
         "tab": "Changelog",
+        "hidden": true,
         "pages": [
           "changelog"
         ]
