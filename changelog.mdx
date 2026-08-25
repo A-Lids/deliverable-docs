@@ -5,15 +5,14 @@ description: 'Product updates and API changes for Deliverable'
 
 <Update label="Aug 25, 2026">
 
-## Bulk Verify API now requires an `emailColumn` field
+## Bulk Verify API now accepts an optional `emailColumn` field
 
-You can now tell Deliverable which CSV column holds the emails, instead of being forced to name that column `Email`.
-
-This is a **breaking change** for `POST /verify/bulk`. Update your integration before you send the next file.
+You can now tell Deliverable which CSV column holds the emails. If you don't send `emailColumn`, the API still looks for a column named `Email`, just like before. Existing integrations keep working.
 
 ### What's changing
 
-- You must send `emailColumn` in the request. That is the header name in your CSV — for example `Email`, `Work Email`, or `email`.
+- `emailColumn` is optional. Omit it and we look for a column named `Email`.
+- Send `emailColumn` if your header is something else, for example `Work Email` or `email`.
 - The file must have a real header row. A bare list of addresses with no header will be rejected.
 - `emailColumn` must be a column name, not an email address.
 
@@ -52,8 +51,8 @@ Email column header is missing from the file
 ### What you need to do
 
 1. Add a header row to every bulk CSV.
-2. Pass that header as `emailColumn`.
-3. If you already use a column named `Email`, send `emailColumn=Email`.
+2. If the column is named `Email`, you don't need to change anything.
+3. If it isn't, pass that header as `emailColumn`.
 
 The website bulk upload is unchanged. Single email verification (`POST /verify/single`) is unchanged.
 

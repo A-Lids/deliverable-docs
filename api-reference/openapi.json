@@ -73,7 +73,7 @@
     "/verify/bulk": {
       "post": {
         "summary": "Verify Bulk Emails",
-        "description": "Upload a CSV file for bulk email verification. The file must have a header row, and you must pass `emailColumn` with the header name of the column that holds email addresses (for example `Email`, `Work Email`, or `email`). Returns a `file_id` to track the processing status via `/verify/bulk/status`. Consumes credits based on the number of emails in the file. Max file size is 25MB.",
+        "description": "Upload a CSV file for bulk email verification. The file must have a header row. If you omit `emailColumn`, the API looks for a column named `Email`. Pass `emailColumn` if your header is something else (for example `Work Email` or `email`). Returns a `file_id` to track the processing status via `/verify/bulk/status`. Consumes credits based on the number of emails in the file. Max file size is 25MB.",
         "requestBody": {
           "required": true,
           "content": {
@@ -226,11 +226,11 @@
       },
       "VerifyBulkEmailRequest": {
         "type": "object",
-        "required": ["file", "fileName", "emailColumn"],
+        "required": ["file", "fileName"],
         "properties": {
-          "file": { "type": "string", "format": "binary", "description": "CSV file with a header row. One of the columns must contain the email addresses to verify. Max size: 25MB." },
+          "file": { "type": "string", "format": "binary", "description": "CSV file with a header row. One of the columns must contain the email addresses to verify. If you omit `emailColumn`, that column must be named `Email`. Max size: 25MB." },
           "fileName": { "type": "string", "description": "Name to identify this file upload", "example": "Q3 outreach" },
-          "emailColumn": { "type": "string", "description": "Header name of the CSV column that holds the email addresses (for example `Email`, `Work Email`, or `email`). Must be a column name, not an email address. If the header is missing from the file, the request is rejected with `Email column header is missing from the file`.", "example": "Work Email" },
+          "emailColumn": { "type": "string", "description": "Optional. Header name of the CSV column that holds the email addresses (for example `Work Email` or `email`). Omit this field to use a column named `Email`. Must be a column name, not an email address. If the header is missing from the file, the request is rejected with `Email column header is missing from the file`.", "example": "Work Email" },
           "mode": { "type": "string", "format": "enum", "description": "The mode to verify the email addresses, by default it is set to catch_all", "enum": ["catch_all", "non_catch_all"], "example": "catch_all" }
         }
       },
