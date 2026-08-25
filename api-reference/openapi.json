@@ -73,7 +73,7 @@
     "/verify/bulk": {
       "post": {
         "summary": "Verify Bulk Emails",
-        "description": "Upload a CSV or TXT file containing a list of email addresses for bulk verification. Returns a `file_id` to track the processing status via `/verify/bulk/status`. Consumes credits based on the number of emails in the file. Max file size is 25MB.",
+        "description": "Upload a CSV file containing a list of email addresses for bulk verification. A column with header named Email is required. Returns a file_id to track the processing status via /verify/bulk/status. Consumes credits based on the number of emails in the file. Max file size is 25MB.",
         "requestBody": {
           "required": true,
           "content": {
